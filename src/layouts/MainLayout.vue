@@ -1,10 +1,8 @@
 <template>
   <q-layout view="hHh lpr fff">
     <!--  HEADER  -->
-    <q-header elevated class="bg-primary text-white">
+    <q-header bordered class="bg-white text-dark">
       <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" />
-
         <q-toolbar-title>
           <q-avatar>
             <img src="~assets/invoicify_logo.svg">
@@ -12,16 +10,20 @@
           Invoicify Hub
         </q-toolbar-title>
         <q-space />
-        <div class="row">
-          <router-link v-for="({ title, route }) of essentialLinks" :key="title" :to="route">
-            {{ title }}
-          </router-link>
-        </div>
+        <q-item
+          v-for="({ title, route }) of essentialLinks"
+          :key="title"
+          :to="route"
+          clickable
+          active-class="text-accent"
+          class="items-center">
+          {{ title }}
+        </q-item>
       </q-toolbar>
     </q-header>
 
     <!--  DRAWER  -->
-    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" elevated>
+    <q-drawer show-if-above v-model="leftDrawerOpen" side="left" elevated :breakpoint="867">
      <router-view name="LeftSidebar"></router-view>
     </q-drawer>
 
@@ -29,18 +31,6 @@
     <q-page-container>
       <router-view />
     </q-page-container>
-
-    <!--  FOOTER  -->
-    <q-footer elevated class="bg-grey-8 text-white">
-      <q-toolbar>
-        <q-toolbar-title>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-          </q-avatar>
-          <div>Title</div>
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-footer>
   </q-layout>
 </template>
 
@@ -53,12 +43,12 @@ export interface EssentialLink {
 }
 const essentialLinks: EssentialLink[] = [
   {
-    title: 'Settings',
-    route: '/settings'
-  },
-  {
     title: 'Invoices',
     route: '/'
+  },
+  {
+    title: 'Settings',
+    route: '/settings'
   },
   {
     title: 'Partners',
@@ -66,9 +56,5 @@ const essentialLinks: EssentialLink[] = [
   }
 ];
 
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+const leftDrawerOpen = ref(true);
 </script>
