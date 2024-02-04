@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, Ref, computed, ComputedRef } from 'vue';
+import { ref, computed, ComputedRef } from 'vue';
 import Auth, { User } from 'gotrue-js';
 
 export interface UserCredentials {
@@ -16,21 +16,24 @@ const auth: Auth = new Auth({
 });
 
 export const useAuthStore = defineStore('auth', () => {
-    const session: Ref<User> = ref({} as User);
+    const user = ref(null as null | User);
+    const isLoggedIn = ref(false);
 
     async function signup ({ email, password }: UserCredentials) {
         await auth.signup(email, password);
     }
 
-    async function confirmSignup(token: Token) {
-        session.value = await auth.confirm(token, true);
+    async function confirmSignup (token: Token) {
+        user.value = await auth.confirm(token, true);
+        isLoggedIn.value = true;
     }
 
-    async function login({ email, password }: UserCredentials) {
-        const session = await auth.login(email, password, true);
+    async function login ({ email, password }: UserCredentials) {
+        user.value = await auth.login(email, password, true);
+        isLoggedIn.value = true;
     }
 
-    async function logout() {
+    async function logout () {
         const user = auth.currentUser();
 
         if (user == null) {
@@ -38,9 +41,20 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         await user.logout();
+        isLoggedIn.value = false;
     }
 
-    const userEmail: ComputedRef<string|null> = computed(() => session.value?.email ?? null);
+    const currentUser: ComputedRef<User | null> = computed(() => user.value);
+    const isAuthenticated: ComputedRef<boolean> = computed(() => isLoggedIn.value);
+    const accessToken: ComputedRef<string | null> = computed(() => user.value?.token.access_token ?? null);
 
-    const accessToken: ComputedRef<string|null> = computed(() => session.value?.token.access_token ?? null);
+    return {
+        currentUser,
+        isAuthenticated,
+        accessToken,
+        signup,
+        confirmSignup,
+        login,
+        logout
+    };
 });
