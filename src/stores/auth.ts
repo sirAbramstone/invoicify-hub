@@ -34,13 +34,14 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     async function logout () {
-        const user = auth.currentUser();
+        const currentUser = auth.currentUser();
 
-        if (user == null) {
+        if (currentUser == null) {
             return;
         }
 
-        await user.logout();
+        await currentUser.logout();
+        user.value = null;
         isLoggedIn.value = false;
     }
 
